@@ -32,7 +32,7 @@ export function Landing({ goto, theme, onToggleTheme }) {
         <div style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: 48, alignItems: "center" }} className="fw-hero-grid">
           <div className="fw-fade-in">
             <div className="fw-badge fw-badge-gold" style={{ marginBottom: 20 }}>
-              <Sparkles size={11} /> Powered by Tether Wallet Development Kit
+              <Sparkles size={11} /> Tether Wallet 
             </div>
             <h1 className="fw-display" style={{ fontSize: "clamp(40px, 5.4vw, 68px)", fontWeight: 900, lineHeight: 0.98, margin: "0 0 20px" }}>
               YOUR CLUB.<br />YOUR CROWD.<br /><span style={{ color: "var(--kit-gold)" }}>YOUR WALLET.</span>
