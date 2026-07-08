@@ -8,6 +8,13 @@ import { getPolicy } from "./policy.js";
 // Wallet-execution service. Holds keys and signs; the React app calls it over
 // /api and contains no wallet/signing logic of its own — clean separation.
 
+// A rejection from a background chain call (RPC hiccup, dropped batch, etc.)
+// that isn't tied to a specific request should never take the whole service
+// down for every user — log it and keep serving.
+process.on("unhandledRejection", (err) => {
+  console.error("Unhandled rejection (service continues running):", err);
+});
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -54,5 +61,8 @@ app.get("/api/wallet/:id/policy", wrap(async (req) => getPolicy(req.params.id)))
 
 app.listen(config.port, () => {
   console.log(`Fan Wallet execution service → http://localhost:${config.port}`);
-  console.log(`Chain: ${config.chainName} · Token: ${config.token.symbol} (${config.token.address})`);
+  console.log(`Chain: ${config.chainName} · Token: ${config.token.symbol} (${config.token.address || "not set"})`);
+  if (!config.token.address || !config.treasury.privateKey) {
+    console.warn("No test token/treasury configured yet — run `npm run deploy:token` (see README).");
+  }
 });

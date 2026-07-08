@@ -3,7 +3,7 @@ import { Loader2, UserPlus } from "lucide-react";
 import { AuthShell } from "../components/layout/AuthShell";
 import { Field } from "../components/ui/Field";
 
-export function Register({ goto, onRegister }) {
+export function Register({ goto, onRegister, theme, onToggleTheme }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,7 +20,7 @@ export function Register({ goto, onRegister }) {
   };
 
   return (
-    <AuthShell title="Create your account" subtitle="Authentication is separate from your wallet — you'll create or import your self-custodial wallet next." back={() => goto("landing")}>
+    <AuthShell title="Create your account" subtitle="Authentication is separate from your wallet — you'll create or import your self-custodial wallet next." back={() => goto("landing")} theme={theme} onToggleTheme={onToggleTheme}>
       <form onSubmit={submit}>
         <Field label="Full name">
           <input className="fw-input fw-focus" placeholder="Alex Rivera" value={name} onChange={(e) => setName(e.target.value)} />

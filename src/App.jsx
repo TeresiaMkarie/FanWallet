@@ -5,6 +5,7 @@ import { api } from "./lib/api";
 import { uid } from "./lib/format";
 import { usePersistentState } from "./hooks/usePersistentState";
 import { useToasts } from "./hooks/useToasts";
+import { useTheme } from "./hooks/useTheme";
 import { GlobalStyle } from "./styles/GlobalStyle";
 
 import { ToastStack } from "./components/ui/ToastStack";
@@ -30,6 +31,7 @@ export default function App() {
   const [route, setRoute] = useState("landing"); // landing | login | register | walletSetup | app
   const [view, setView] = useState("dashboard");
   const [toasts, toast] = useToasts();
+  const [theme, toggleTheme] = useTheme();
   // Recovery phrase is kept in memory for this session only — never persisted.
   const [sessionPhrase, setSessionPhrase] = useState(null);
 
@@ -97,7 +99,7 @@ export default function App() {
 
   if (!loaded) {
     return (
-      <div className="fw-root" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh" }}>
+      <div className="fw-root" data-theme={theme} style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh" }}>
         <GlobalStyle />
         <Loader2 size={22} className="fw-pulse-dot" color="var(--kit-gold)" />
       </div>
@@ -105,19 +107,19 @@ export default function App() {
   }
 
   return (
-    <div className="fw-root">
+    <div className="fw-root" data-theme={theme}>
       <GlobalStyle />
       <ToastStack toasts={toasts} />
 
-      {route === "landing" && <Landing goto={setRoute} />}
-      {route === "login" && <Login goto={setRoute} onLogin={onLogin} existingUser={state.user} />}
-      {route === "register" && <Register goto={setRoute} onRegister={onRegister} />}
-      {route === "walletSetup" && <WalletSetup onDone={onWalletDone} toast={toast} />}
+      {route === "landing" && <Landing goto={setRoute} theme={theme} onToggleTheme={toggleTheme} />}
+      {route === "login" && <Login goto={setRoute} onLogin={onLogin} existingUser={state.user} theme={theme} onToggleTheme={toggleTheme} />}
+      {route === "register" && <Register goto={setRoute} onRegister={onRegister} theme={theme} onToggleTheme={toggleTheme} />}
+      {route === "walletSetup" && <WalletSetup onDone={onWalletDone} toast={toast} theme={theme} onToggleTheme={toggleTheme} />}
 
       {route === "app" && state.user && state.wallet && (
         <div style={{ display: "flex" }}>
           <div className="fw-shell-sidebar">
-            <Sidebar view={view} setView={setView} user={state.user} onLogout={onLogout} />
+            <Sidebar view={view} setView={setView} user={state.user} onLogout={onLogout} theme={theme} onToggleTheme={toggleTheme} />
           </div>
           <main className="fw-scroll" style={{ flex: 1, padding: "26px 28px 90px", maxWidth: 1180, margin: "0 auto", width: "100%" }}>
             {view === "dashboard" && <Dashboard state={state} setView={setView} toast={toast} />}

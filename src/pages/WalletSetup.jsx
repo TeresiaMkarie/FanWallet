@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Wallet, Plus, RefreshCw, ChevronRight, ShieldAlert, ArrowRight, Loader2 } from "lucide-react";
 import { Card } from "../components/ui/Card";
 import { Field } from "../components/ui/Field";
+import { ThemeToggle } from "../components/ui/ThemeToggle";
 import { api } from "../lib/api";
 
-export function WalletSetup({ onDone, toast }) {
+export function WalletSetup({ onDone, toast, theme, onToggleTheme }) {
   const [mode, setMode] = useState(null); // 'create' | 'import'
   const [phrase, setPhrase] = useState([]);
   const [walletId, setWalletId] = useState("");
@@ -13,18 +14,21 @@ export function WalletSetup({ onDone, toast }) {
   const [importValue, setImportValue] = useState("");
   const [step, setStep] = useState(1);
   const [busy, setBusy] = useState(false);
+  const [funding, setFunding] = useState(null);
 
   // Generate a real BIP-39 wallet via WDK (in the execution service), then show
-  // the phrase once for the user to back up.
+  // the phrase once for the user to back up. The service also auto-funds the
+  // wallet with test USD₮ + gas (no public testnet USD₮ faucet exists).
   const startCreate = async () => {
     setMode("create");
     setStep(1);
     setBusy(true);
     try {
-      const { walletId, address, seedPhrase } = await api.createWallet();
+      const { walletId, address, seedPhrase, funding } = await api.createWallet();
       setWalletId(walletId);
       setAddress(address);
       setPhrase(seedPhrase);
+      setFunding(funding || null);
     } catch (e) {
       toast(e.message || "Couldn't create a wallet — is the wallet service running?", "error");
       setMode(null);
@@ -35,7 +39,11 @@ export function WalletSetup({ onDone, toast }) {
 
   const finishCreate = () => {
     onDone({ walletId, address, phrase });
-    toast("Wallet created — you hold the keys.");
+    toast(
+      funding?.funded
+        ? `Wallet created — funded with ${funding.usdtAmount} test USD₮ and gas.`
+        : "Wallet created — you hold the keys."
+    );
   };
 
   const finishImport = async () => {
@@ -57,7 +65,10 @@ export function WalletSetup({ onDone, toast }) {
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
       <div className="fw-fade-in" style={{ width: 480, maxWidth: "100%" }}>
         <Card style={{ padding: 28 }}>
-          <div className="fw-badge fw-badge-gold" style={{ marginBottom: 14 }}><Wallet size={11} /> Powered by Tether WDK</div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <div className="fw-badge fw-badge-gold"><Wallet size={11} /> Powered by Tether WDK</div>
+            <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+          </div>
           <h2 className="fw-display" style={{ fontSize: 26, fontWeight: 800, margin: "0 0 6px" }}>Set up your wallet</h2>
           <p style={{ fontSize: 13.5, color: "var(--chalk-dim)", marginBottom: 22 }}>
             A real BIP-39 wallet, created with WDK. You get the recovery phrase — the app and wallet
