@@ -1,8 +1,9 @@
 import { Wallet, LogOut } from "lucide-react";
 import { NAV_ITEMS } from "../../data/navigation";
 import { PitchDivider } from "../ui/PitchDivider";
+import { ThemeToggle } from "../ui/ThemeToggle";
 
-export function Sidebar({ view, setView, user, onLogout }) {
+export function Sidebar({ view, setView, user, onLogout, theme, onToggleTheme }) {
   return (
     <>
       <aside className="fw-scroll" style={{
@@ -32,6 +33,7 @@ export function Sidebar({ view, setView, user, onLogout }) {
             <div style={{ fontSize: 12.5, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{user?.name}</div>
             <div style={{ fontSize: 11, color: "var(--chalk-dim)" }}>Fan account</div>
           </div>
+          <ThemeToggle theme={theme} onToggle={onToggleTheme} />
           <button className="fw-btn fw-btn-ghost fw-btn-sm fw-focus" onClick={onLogout} aria-label="Log out"><LogOut size={14} /></button>
         </div>
       </aside>

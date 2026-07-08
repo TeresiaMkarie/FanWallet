@@ -11,12 +11,14 @@ export function GlobalStyle() {
         --pitch-panel: #143726;
         --pitch-line: #234E3B;
         --touchline: #F4F6F0;
+        --touchline-rgb: 244,246,240;
         --kit-gold: #E8B54A;
         --kit-gold-dim: #B98B2E;
         --chalk-dim: #9FB3A9;
         --yellow-card: #F2C230;
         --red-card: #E15B5B;
         --pitch-accent: #45B884;
+        --overlay-hover: rgba(255,255,255,0.04);
         --font-display: 'Big Shoulders Display', sans-serif;
         --font-body: 'Inter', sans-serif;
         --font-mono: 'JetBrains Mono', monospace;
@@ -25,8 +27,27 @@ export function GlobalStyle() {
         color: var(--touchline);
         min-height: 100vh;
         position: relative;
+        transition: background-color 0.2s ease, color 0.2s ease;
+      }
+      .fw-root[data-theme="light"] {
+        --pitch-night: #F3F7F3;
+        --pitch-deep: #E7EFE8;
+        --pitch-panel: #FFFFFF;
+        --pitch-line: #DCE6DE;
+        --touchline: #0E1F17;
+        --touchline-rgb: 14,31,23;
+        --kit-gold: #A9761F;
+        --kit-gold-dim: #8A5F16;
+        --chalk-dim: #5C7568;
+        --yellow-card: #C99A1E;
+        --red-card: #C13F3F;
+        --pitch-accent: #1F8A5A;
+        --overlay-hover: rgba(11,31,23,0.05);
       }
       .fw-root * { box-sizing: border-box; }
+      .fw-card, .fw-badge {
+        transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+      }
       .fw-display { font-family: var(--font-display); letter-spacing: 0.01em; }
       .fw-mono { font-family: var(--font-mono); }
 
@@ -76,7 +97,8 @@ export function GlobalStyle() {
         padding: 11px 18px;
         display: inline-flex; align-items: center; justify-content: center; gap: 8px;
         cursor: pointer;
-        transition: transform 0.12s ease, filter 0.12s ease, background 0.12s ease;
+        transition: transform 0.12s ease, filter 0.12s ease, background 0.12s ease,
+          background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
         border: 1px solid transparent;
         user-select: none;
       }
@@ -85,7 +107,7 @@ export function GlobalStyle() {
       .fw-btn-primary { background: var(--kit-gold); color: #16210F; }
       .fw-btn-primary:hover:not(:disabled) { filter: brightness(1.08); }
       .fw-btn-ghost { background: transparent; color: var(--touchline); border-color: var(--pitch-line); }
-      .fw-btn-ghost:hover:not(:disabled) { background: rgba(255,255,255,0.04); }
+      .fw-btn-ghost:hover:not(:disabled) { background: var(--overlay-hover); }
       .fw-btn-danger { background: rgba(214,69,69,0.12); color: var(--red-card); border-color: rgba(214,69,69,0.35); }
       .fw-btn-danger:hover:not(:disabled) { background: rgba(214,69,69,0.2); }
       .fw-btn-sm { padding: 7px 12px; font-size: 12.5px; border-radius: 8px; }
@@ -100,7 +122,8 @@ export function GlobalStyle() {
         font-family: var(--font-body);
         font-size: 14px;
         outline: none;
-        transition: border-color 0.12s ease, box-shadow 0.12s ease;
+        transition: border-color 0.12s ease, box-shadow 0.12s ease,
+          background-color 0.2s ease, color 0.2s ease;
       }
       .fw-input:focus {
         border-color: var(--kit-gold);
@@ -119,7 +142,7 @@ export function GlobalStyle() {
         transition: background 0.12s ease, color 0.12s ease;
         border-left: 3px solid transparent;
       }
-      .fw-nav-item:hover { background: rgba(255,255,255,0.04); color: var(--touchline); }
+      .fw-nav-item:hover { background: var(--overlay-hover); color: var(--touchline); }
       .fw-nav-item.active {
         background: rgba(232,181,74,0.1); color: var(--kit-gold);
         border-left: 3px solid var(--kit-gold);
@@ -149,7 +172,7 @@ export function GlobalStyle() {
 
       .fw-jersey-num {
         font-family: var(--font-display); font-weight: 900; font-size: 64px;
-        color: rgba(244,246,240,0.06); line-height: 1; position: absolute; right: 10px; top: -6px;
+        color: rgba(var(--touchline-rgb), 0.06); line-height: 1; position: absolute; right: 10px; top: -6px;
         pointer-events: none; user-select: none;
       }
 

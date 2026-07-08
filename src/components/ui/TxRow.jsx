@@ -8,7 +8,7 @@ export function TxRow({ tx }) {
   const negative = tx.type === "send" || tx.type === "ticket" || tx.type === "tip" || tx.type === "split";
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 4px", borderBottom: "1px solid var(--pitch-line)" }}>
-      <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+      <div style={{ width: 38, height: 38, borderRadius: 10, background: "var(--overlay-hover)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
         <Icon size={17} color={meta.color} />
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>

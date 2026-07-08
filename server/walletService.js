@@ -7,6 +7,8 @@ import { config } from "./config.js";
 import { parseUnits, toNumber } from "./units.js";
 import { checkPolicy } from "./policy.js";
 import { saveWallet, getSeed, getRecord, recordSend, getSends } from "./store.js";
+import { fundNewWallet } from "./treasury.js";
+import { makeEip1193Provider } from "./rpcProvider.js";
 
 // Thin wrapper over the real WDK EVM SDK. This is the ONLY module that ever
 // touches a seed phrase or signs — the rest of the app never sees keys.
@@ -18,7 +20,7 @@ function newId() {
 // Build a live WDK account (index 0) from a stored seed. Caller must dispose.
 async function openAccount(mnemonic) {
   const root = new SeedSignerEvm(mnemonic);
-  const wallet = new WalletManagerEvm(root, { provider: config.rpcUrl });
+  const wallet = new WalletManagerEvm(root, { provider: makeEip1193Provider(config.rpcUrl) });
   const account = await wallet.getAccount(0);
   return { wallet, account };
 }
@@ -38,8 +40,11 @@ export async function createWallet() {
   const address = await deriveAddress(mnemonic);
   const id = newId();
   saveWallet({ id, address, mnemonic });
+  // No public testnet USD₮ faucet exists, so the app's own treasury mints test
+  // USD₮ and sends a little gas to every wallet it creates — best-effort.
+  const funding = await fundNewWallet(address);
   // seedPhrase is returned ONCE so the user can back it up; never persisted plaintext.
-  return { walletId: id, address, seedPhrase: mnemonic.split(" ") };
+  return { walletId: id, address, seedPhrase: mnemonic.split(" "), funding };
 }
 
 export async function importWallet(words) {

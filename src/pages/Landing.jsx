@@ -4,9 +4,10 @@ import {
 } from "lucide-react";
 import { Card } from "../components/ui/Card";
 import { PitchDivider } from "../components/ui/PitchDivider";
+import { ThemeToggle } from "../components/ui/ThemeToggle";
 import { fmtUSDT } from "../lib/format";
 
-export function Landing({ goto }) {
+export function Landing({ goto, theme, onToggleTheme }) {
   return (
     <div style={{ minHeight: "100vh", position: "relative", overflow: "hidden" }}>
       <div style={{
@@ -21,7 +22,8 @@ export function Landing({ goto }) {
             </div>
             <span className="fw-display" style={{ fontSize: 20, fontWeight: 800, letterSpacing: "0.02em" }}>FAN WALLET</span>
           </div>
-          <div style={{ display: "flex", gap: 10 }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            <ThemeToggle theme={theme} onToggle={onToggleTheme} />
             <button className="fw-btn fw-btn-ghost fw-focus" onClick={() => goto("login")}>Sign in</button>
             <button className="fw-btn fw-btn-primary fw-focus" onClick={() => goto("register")}>Create account</button>
           </div>
@@ -76,7 +78,7 @@ export function Landing({ goto }) {
                   { icon: Trophy, label: "Predictor reward", amt: 25, color: "var(--pitch-accent)" },
                 ].map((r, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0" }}>
-                    <div style={{ width: 34, height: 34, borderRadius: 9, background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: 34, height: 34, borderRadius: 9, background: "var(--overlay-hover)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <r.icon size={15} color={r.color} />
                     </div>
                     <div style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>{r.label}</div>

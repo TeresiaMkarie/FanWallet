@@ -8,14 +8,25 @@ Development Kit (WDK)** with real testnet transactions.
 
 ```
 React (Vite) UI  ──HTTP /api──►  Node wallet-execution service  ──►  EVM testnet
- app + business logic             @tetherto/wdk-wallet-evm             (RPC + USD₮ ERC-20)
- (no keys, no signing)            wallet create/import, balance,
-                                  real ERC-20 transfer, spending policy
+ app + business logic             @tetherto/wdk-wallet-evm             (RPC + TestUSDT ERC-20)
+ (no keys, no signing)            wallet create/import, balance,           ▲
+                                  real ERC-20 transfer, spending policy     │
+                                        │ mint + gas on wallet creation ────┘
+                                        ▼
+                                  Treasury wallet (server/treasury.js)
+                                  owns TestUSDT, holds native gas
 ```
 
 - **Real WDK.** The service uses `@tetherto/wdk-wallet-evm` (`SeedSignerEvm` +
   `WalletManagerEvm`) to generate BIP-39 wallets, read native + ERC-20 balances, and send
   real ERC-20 (USD₮) transfers on a testnet.
+- **Our own test USD₮.** Public testnet USDt faucets aren't reliably available, so
+  [contracts/TestUSDT.sol](contracts/TestUSDT.sol) is a minimal ERC-20 stand-in the app deploys
+  and controls itself. The **treasury** wallet ([server/treasury.js](server/treasury.js)) owns it
+  and auto-mints test USD₮ — plus sends a little native gas — to every wallet the app creates, so
+  nobody needs a faucet at all. Minting isn't a WDK primitive (WDK's ERC-20 surface is
+  transfer/approve/balance), so the treasury uses `ethers` directly; user wallet execution still
+  goes exclusively through WDK.
 - **Clean separation.** The React app contains no signing logic — it only calls `/api`. All
   key handling lives in [server/](server/).
 - **Programmable spending limits.** Every transfer is checked against a per-transfer and a
@@ -36,7 +47,20 @@ address.
 ```bash
 npm install
 cp .env.example .env        # then set a random SERVER_SECRET (see the file)
-npm run dev:all             # runs the Vite UI (:5173) + wallet service (:8787) together
+```
+
+One-time: deploy your own test USD₮ token and treasury (no public testnet USDt faucet needed):
+
+```bash
+npm run deploy:token   # 1st run: generates a treasury wallet, prints its address, exits
+#             → fund that address with testnet ETH from any public Sepolia faucet
+npm run deploy:token   # 2nd run: deploys TestUSDT, saves USDT_TOKEN_ADDRESS to .env
+```
+
+Then run the app:
+
+```bash
+npm run dev:all              # runs the Vite UI (:5173) + wallet service (:8787) together
 ```
 
 Open **http://localhost:5173**. (Or run them separately: `npm run dev` and `npm run server`.)
@@ -45,20 +69,20 @@ Open **http://localhost:5173**. (Or run them separately: `npm run dev` and `npm 
 
 All chain/wallet settings live in `.env` (see [.env.example](.env.example)):
 `RPC_URL`, `CHAIN`, `EXPLORER_URL`, `USDT_TOKEN_ADDRESS` / `USDT_DECIMALS` / `USDT_SYMBOL`,
-`SERVER_SECRET`, and the spending policy (`POLICY_PER_TX_LIMIT`, `POLICY_DAILY_LIMIT`).
+`SERVER_SECRET`, the spending policy (`POLICY_PER_TX_LIMIT`, `POLICY_DAILY_LIMIT`), and the
+treasury/faucet (`TREASURY_PRIVATE_KEY`, `FAUCET_USDT_AMOUNT`, `FAUCET_NATIVE_AMOUNT`).
 
-Defaults target **Sepolia** with a test USDC (6 decimals) standing in for USD₮ — swap the token
-address for a real testnet USD₮/XAU₮ when available.
+Defaults target **Sepolia**. `USDT_TOKEN_ADDRESS` and `TREASURY_PRIVATE_KEY` are written for you
+by `npm run deploy:token` — leave them blank until you've run it.
 
 ## Try it end-to-end
 
 1. Register → **Create a new wallet**. You get a real 0x address and a real 12-word phrase
-   (shown once — back it up).
-2. Fund the address from a testnet faucet: you need **both** native coin (for gas) and the
-   USD₮/test-token. The Dashboard balance then reflects the real on-chain balance.
-3. **Send** USD₮ to another address → the service signs and broadcasts a real ERC-20 transfer;
+   (shown once — back it up) — and the treasury automatically mints test USD₮ and sends a
+   little native gas to it, so the Dashboard balance is non-zero immediately, no faucet needed.
+2. **Send** USD₮ to another address → the service signs and broadcasts a real ERC-20 transfer;
    verify the tx hash on the block explorer.
-4. Try a send above the per-transfer or daily limit → the spending policy blocks it before
+3. Try a send above the per-transfer or daily limit → the spending policy blocks it before
    signing. See the limits on the **Security** page.
 
 ## Deferred / roadmap

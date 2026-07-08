@@ -3,7 +3,7 @@ import { Eye, EyeOff, Loader2, LogIn } from "lucide-react";
 import { AuthShell } from "../components/layout/AuthShell";
 import { Field } from "../components/ui/Field";
 
-export function Login({ goto, onLogin, existingUser }) {
+export function Login({ goto, onLogin, existingUser, theme, onToggleTheme }) {
   const [email, setEmail] = useState(existingUser?.email || "");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -23,7 +23,7 @@ export function Login({ goto, onLogin, existingUser }) {
   };
 
   return (
-    <AuthShell title="Welcome back" subtitle="Sign in to reach your dashboard." back={() => goto("landing")}>
+    <AuthShell title="Welcome back" subtitle="Sign in to reach your dashboard." back={() => goto("landing")} theme={theme} onToggleTheme={onToggleTheme}>
       <form onSubmit={submit}>
         <Field label="Email">
           <input className="fw-input fw-focus" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
